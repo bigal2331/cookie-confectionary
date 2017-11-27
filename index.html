@@ -1,0 +1,156 @@
+<!DOCTYPE>
+<html>
+<head>
+	<title>Cookies Confectionary</title>
+	<style>
+		#container{
+			text-align: center;
+			color:#7a7373;
+			font-weight: 700;
+		}
+
+		#final-order{
+			background-color: #eaefeb;
+			border: 2px solid #e0e0e2;
+			border-radius: 5px;
+			margin: 20px auto;
+			width: 50%;
+			
+
+		}
+		.btn {
+		    position: relative;
+		    background-color: #eaefeb;
+		    border: none;
+			box-shadow: 0 2px #999;
+			border-radius: 5px;
+		    padding: 8px;
+		    width: 30px;
+		    text-align: center;
+		    -webkit-transition-duration: 0.4s; /* Safari */
+		    transition-duration: 0.4s;
+		    text-decoration: none;
+		    overflow: hidden;
+		    cursor: pointer;
+		    float: right;
+		}
+
+		.btn:active {
+		  background-color: #3e8e41;
+		  box-shadow: 0 10px #666;
+		  transform: translateY(4px);
+		}
+
+		.checkout:active {
+		  background-color: #3e8e41;
+		  box-shadow: 0 10px #666;
+		  transform: translateY(4px);
+		}
+		.checkout {
+			border: none;
+			color:black;
+			box-shadow: 0 2px #999;
+			transition-duration: 0.4s;
+			border-radius: 5px;
+			cursor: pointer;
+			padding: 8px;
+		    width: 30px;
+		    background-color: #840018;
+		}
+
+		#final-order {
+			margin-bottom: 20px;
+		}
+		
+		.cookies{
+			background-color: #e0e0e2;
+			border-radius: 5px;
+			width: 30%;
+			padding: 20px 2px;
+			margin: 2px auto;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="container">
+		<h1>Cookies Confectionary</h1>
+		<div id="final-order">
+		</div>
+		<span class="checkout clear" id="clear">Clear</span>
+	</div>	
+
+	<script src="./node_modules/js-cookie/src/js.cookie.js"></script>
+	<script type="text/javascript">
+
+		// 1. to run echo -e '\nalias served="ruby -run -e httpd . -p 5001"' >> ~/.bash_profile && source ~/.bash_profile
+		// 2. type served
+		let clear = document.getElementById('clear');
+		let finalOrder = document.getElementById('final-order');
+		let order = {"Chocolate" : 0, "Sugar": 0, "Lemon":0}
+		//create final-order node
+		let checkOutList = (order) => {
+			for (const cookie in order){
+				const div = document.createElement("div");
+				const count = document.createElement("span");
+				const addBtn = document.createElement("span");
+				const cookieName = document.createTextNode(cookie + ": "); 
+				const addText = document.createTextNode("Add"); 
+				const sum = document.createTextNode(order[cookie]); 
+
+				count.appendChild(sum);
+				addBtn.appendChild(addText)
+				addBtn.setAttribute('class', "btn Add")
+				addBtn.setAttribute("id", cookie);
+
+				div.appendChild(cookieName);
+				div.appendChild(count);
+				div.appendChild(addBtn);
+
+				div.setAttribute("id", cookie);
+				div.setAttribute("class", "cookies");
+				finalOrder.appendChild(div); 
+			}
+			let addBtns = document.querySelectorAll('.Add');
+
+			addBtns.forEach((btn) => btn.addEventListener("click",(event) => {
+
+				let type = event.target.id;
+				console.log('this is the type', type);
+
+				order[type] += 1;
+				finalOrder.innerHTML = "";
+				if(Cookies.get('order')){
+					Cookies.remove('order')
+				};			
+				Cookies.set("order", JSON.stringify(order));
+				checkOutList(order);			
+			}))
+		}
+
+		let resetOrder = (order) => {
+			for(const cookie in order){
+				order[cookie] = 0;
+			}
+			checkOutList(order);
+		}
+		
+
+		if(Cookies.get('order')){
+			//if order cookie initialize order to the cookie's values
+			let savedCookie = JSON.parse(Cookies.get('order'));
+			order = savedCookie;
+		}
+
+		// initialize the order list
+		checkOutList(order);
+
+		//remove the order cookie
+		clear.addEventListener('click', () => {
+			finalOrder.innerHTML = "";
+			resetOrder(order);
+			Cookies.remove('order')
+		})		
+	</script>
+</body>
+</html>
